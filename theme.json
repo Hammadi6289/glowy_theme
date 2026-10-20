@@ -16,7 +16,11 @@
         "fonts",
         "color",
         "breadcrumb",
-        "section-styles"
+        "section-styles",
+        "filters",
+        "component-fixed-banner",
+        "component-photos-slider",
+        "component-square-photos"
     ],
     "compatibility": {
         "platform_min": "1.0.0",
