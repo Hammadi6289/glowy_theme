@@ -1,0 +1,234 @@
+{
+    "key": "falak-photo-grid",
+    "path": "home.photo-grid",
+    "title": {
+        "ar": "شبكة صور",
+        "en": "Photo Grid"
+    },
+    "icon": "grid-line",
+    "is_default": false,
+    "areas": [
+        "home",
+        "pages"
+    ],
+    "styleable": [
+        {
+            "id": "title",
+            "label": {
+                "ar": "عنوان القسم",
+                "en": "Section title"
+            }
+        },
+        {
+            "id": "subtitle",
+            "label": {
+                "ar": "نص القسم",
+                "en": "Section text"
+            }
+        },
+        {
+            "id": "items",
+            "label": {
+                "ar": "البلاطة",
+                "en": "Tile"
+            },
+            "properties": [
+                "border_radius",
+                "border_width",
+                "border_color",
+                "max_width",
+                "align_self"
+            ]
+        },
+        {
+            "id": "caption",
+            "label": {
+                "ar": "التعليق",
+                "en": "Caption"
+            }
+        }
+    ],
+    "fields": [
+        {
+            "id": "title",
+            "type": "string",
+            "format": "text",
+            "label": {
+                "ar": "عنوان القسم",
+                "en": "Section title"
+            },
+            "multilanguage": true,
+            "required": false,
+            "maxLength": 100,
+            "value": {
+                "ar": "تسوق حسب الفئات",
+                "en": "Shop by category"
+            }
+        },
+        {
+            "id": "subtitle",
+            "type": "string",
+            "format": "textarea",
+            "label": {
+                "ar": "نص تحت العنوان",
+                "en": "Text under the title"
+            },
+            "multilanguage": true,
+            "required": false,
+            "maxLength": 255,
+            "value": {
+                "ar": "اكتشف تشكيلتنا المختارة من أفضل المنتجات المصممة لتلبية احتياجاتك بأعلى جودة",
+                "en": "Discover our curated collection of quality products tailored to your everyday needs"
+            }
+        },
+        {
+            "id": "items",
+            "type": "collection",
+            "format": "collection",
+            "label": {
+                "ar": "الصور",
+                "en": "Photos"
+            },
+            "item_label": {
+                "ar": "صورة",
+                "en": "Photo"
+            },
+            "description": {
+                "ar": "لكل صورة: اختر فئة (يُستخدم اسمها ورابطها وفئاتها الفرعية) أو اكتب اسمًا ورابطًا. اترك القائمة فارغة لعرض كل الفئات الرئيسية في متجرك.",
+                "en": "For each photo pick a category (its name, link and sub-categories are used) or type a caption and link. Leave the list empty to show all your store's main categories."
+            },
+            "required": false,
+            "minLength": 0,
+            "maxLength": 12,
+            "value": [
+                {
+                    "items.category": null,
+                    "items.image": "",
+                    "items.title": {
+                        "ar": "العناية بالشعر",
+                        "en": "Hair care"
+                    },
+                    "items.url": "/"
+                },
+                {
+                    "items.category": null,
+                    "items.image": "",
+                    "items.title": {
+                        "ar": "العناية بالبشرة",
+                        "en": "Skincare"
+                    },
+                    "items.url": "/"
+                },
+                {
+                    "items.category": null,
+                    "items.image": "",
+                    "items.title": {
+                        "ar": "مكياج",
+                        "en": "Makeup"
+                    },
+                    "items.url": "/",
+                    "items.subs": {
+                        "ar": "أدوات المكياج | /\nمكياج الشفاه | /\nمكياج العيون | /",
+                        "en": "Makeup Tools | /\nLip Makeup | /\nEye Makeup | /"
+                    }
+                },
+                {
+                    "items.category": null,
+                    "items.image": "",
+                    "items.title": {
+                        "ar": "العطور",
+                        "en": "perfumes"
+                    },
+                    "items.url": "/"
+                }
+            ],
+            "fields": [
+                {
+                    "id": "items.category",
+                    "type": "string",
+                    "format": "category",
+                    "label": {
+                        "ar": "الفئة",
+                        "en": "Category"
+                    },
+                    "description": {
+                        "ar": "يُستخدم اسمها ورابطها وفئاتها الفرعية",
+                        "en": "Its name, link and sub-categories are used"
+                    },
+                    "required": false
+                },
+                {
+                    "id": "items.image",
+                    "type": "string",
+                    "format": "image",
+                    "label": {
+                        "ar": "الصورة",
+                        "en": "Photo"
+                    },
+                    "description": {
+                        "ar": "الأفضل مربعة، مثل 600×600",
+                        "en": "Square works best, e.g. 600×600"
+                    },
+                    "required": false
+                },
+                {
+                    "id": "items.title",
+                    "type": "string",
+                    "format": "text",
+                    "label": {
+                        "ar": "الاسم",
+                        "en": "Caption"
+                    },
+                    "description": {
+                        "ar": "اختياري — يحل محل اسم الفئة",
+                        "en": "Optional — replaces the category's own name"
+                    },
+                    "multilanguage": true,
+                    "required": false,
+                    "maxLength": 60
+                },
+                {
+                    "id": "items.url",
+                    "type": "string",
+                    "format": "text",
+                    "label": {
+                        "ar": "الرابط",
+                        "en": "Link"
+                    },
+                    "description": {
+                        "ar": "فقط إذا لم تختر فئة",
+                        "en": "Only when no category is picked"
+                    },
+                    "required": false,
+                    "maxLength": 500
+                },
+                {
+                    "id": "items.subs",
+                    "type": "string",
+                    "format": "textarea",
+                    "label": {
+                        "ar": "الفئات الفرعية",
+                        "en": "Sub-categories"
+                    },
+                    "description": {
+                        "ar": "تظهر خلف البطاقة. سطر لكل فئة: الاسم | الرابط. اتركه فارغًا لعرض الفئات الفرعية للفئة المختارة.",
+                        "en": "Shown on the back of the card. One per line: Name | link. Leave empty to use the picked category's own sub-categories."
+                    },
+                    "multilanguage": true,
+                    "required": false,
+                    "maxLength": 1000
+                }
+            ]
+        },
+        {
+            "id": "autoplay",
+            "type": "boolean",
+            "format": "switch",
+            "label": {
+                "ar": "تحريك تلقائي",
+                "en": "Move automatically"
+            },
+            "value": true
+        }
+    ]
+}

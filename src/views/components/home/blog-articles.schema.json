@@ -1,0 +1,164 @@
+{
+    "key": "falak-blog-articles",
+    "path": "home.blog-articles",
+    "title": {
+        "ar": "مقالات المدونة",
+        "en": "Blog articles"
+    },
+    "icon": "article-line",
+    "is_default": false,
+    "areas": [
+        "home",
+        "pages"
+    ],
+    "styleable": [
+        {
+            "id": "title",
+            "label": {
+                "ar": "عنوان القسم",
+                "en": "Section title"
+            }
+        },
+        {
+            "id": "subtitle",
+            "label": {
+                "ar": "نص القسم",
+                "en": "Section text"
+            }
+        },
+        {
+            "id": "article_title",
+            "label": {
+                "ar": "عنوان المقال",
+                "en": "Article title"
+            }
+        },
+        {
+            "id": "read_more",
+            "label": {
+                "ar": "رابط اقرأ المزيد",
+                "en": "Read more link"
+            }
+        },
+        {
+            "id": "view_all",
+            "label": {
+                "ar": "زر عرض جميع المقالات",
+                "en": "View all articles button"
+            }
+        }
+    ],
+    "fields": [
+        {
+            "id": "title",
+            "type": "string",
+            "format": "text",
+            "label": {
+                "ar": "العنوان",
+                "en": "Title"
+            },
+            "multilanguage": true,
+            "required": false,
+            "maxLength": 100,
+            "value": {
+                "ar": "أحدث المقالات والأخبار",
+                "en": "Latest Articles & News"
+            }
+        },
+        {
+            "id": "subtitle",
+            "type": "string",
+            "format": "textarea",
+            "label": {
+                "ar": "نص تحت العنوان",
+                "en": "Text under the title"
+            },
+            "multilanguage": true,
+            "required": false,
+            "maxLength": 255,
+            "value": {
+                "ar": "نقدم لك مقالات ونصائح مفيدة لمساعدتك في اتخاذ قرارات تسوق أفضل والاستفادة من أفضل التجارب",
+                "en": "Explore insightful articles and tips to help you make informed choices and get the best shopping experience"
+            }
+        },
+        {
+            "id": "limit",
+            "type": "number",
+            "format": "integer",
+            "label": {
+                "ar": "عدد المقالات",
+                "en": "Number of articles"
+            },
+            "description": {
+                "ar": "أقصى عدد من المقالات يُعرض من لوحة التحكم",
+                "en": "Maximum number of articles to display from the dashboard"
+            },
+            "required": false,
+            "min": 1,
+            "max": 12,
+            "value": 4
+        },
+        {
+            "id": "read_more",
+            "type": "string",
+            "format": "text",
+            "label": {
+                "ar": "نص «اقرأ المزيد»",
+                "en": "“Read more” label"
+            },
+            "multilanguage": true,
+            "required": false,
+            "maxLength": 30,
+            "value": {
+                "ar": "اقرأ المزيد",
+                "en": "Read more"
+            }
+        },
+        {
+            "id": "show_view_all",
+            "type": "boolean",
+            "format": "switch",
+            "label": {
+                "ar": "إظهار زر «عرض جميع المقالات»",
+                "en": "Show “View all articles” button"
+            },
+            "description": {
+                "ar": "زر اختياري أسفل المقالات ينقل الزائر إلى صفحة كل المقالات",
+                "en": "Optional button below articles that links visitors to all articles"
+            },
+            "value": true
+        },
+        {
+            "id": "view_all_text",
+            "type": "string",
+            "format": "text",
+            "label": {
+                "ar": "نص زر عرض الكل",
+                "en": "View all button text"
+            },
+            "multilanguage": true,
+            "required": false,
+            "maxLength": 50,
+            "value": {
+                "ar": "عرض جميع المقالات",
+                "en": "View All Articles"
+            }
+        },
+        {
+            "id": "view_all_url",
+            "type": "string",
+            "format": "text",
+            "label": {
+                "ar": "رابط عرض الكل",
+                "en": "View all URL"
+            },
+            "description": {
+                "ar": "رابط صفحة جميع المقالات (الافتراضي: /blogs)",
+                "en": "URL for all articles page (default: /blogs)"
+            },
+            "required": false,
+            "maxLength": 255,
+            "value": "/blogs"
+        }
+    ]
+}

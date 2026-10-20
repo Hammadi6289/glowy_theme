@@ -1,0 +1,59 @@
+{#
+    Looping video — no controls, no links, no branding.
+    | Variable             | Type    | Description                          |
+    | component.source     | string  | "upload" or "url"                    |
+    | component.video_file | ?string | uploaded video (source = upload)     |
+    | component.video_url  | ?string | direct MP4/WebM URL (source = url)   |
+    | component.poster     | string  | required poster image                |
+    | component.ratio      | ?string | CSS aspect-ratio, e.g. "16/9"        |
+    | component.full_width | ?bool   | span the full viewport width         |
+    | position             | int     |                                      |
+
+    muted + playsinline are required for browsers (iOS included) to autoplay.
+    No `controls` attribute, and pointer-events are disabled so the native
+    overlay / right-click menu never appears.
+
+    Validation: if either the video or the poster is missing, a visible error
+    notice is rendered. Uses only boolean flags — no merge/join (sandbox blocked).
+#}
+{% set ratio = component.ratio|default('16/9') %}
+{% if ratio is iterable %}{% set ratio = ratio|first %}{% endif %}
+{% set source = component.source|default('upload') %}
+{% if source is iterable %}{% set source = source|first %}{% endif %}
+{% set video_src = source == 'url' ? component.video_url : component.video_file %}
+{% set missing_video  = not video_src %}
+{% set missing_poster = not component.poster %}
+{% set has_error = missing_video or missing_poster %}
+<section class="block block--ambient-video{{ component.full_width ? ' is-full' : '' }}" id="ambient-video-{{ position }}" {{ falak_section() }}>
+    <div class="{{ component.full_width ? '' : 'container' }}">
+        {% if has_error %}
+            <div class="ambient-video-notice" role="alert" aria-live="polite">
+                <span class="ambient-video-notice__icon">&#9888;&#65039;</span>
+                <span class="ambient-video-notice__text">
+                    <strong>Looping Video</strong> required field{{ (missing_video and missing_poster) ? 's are' : ' is' }} empty:
+                    {% if missing_video %}<em>{{ source == 'url' ? 'Video file URL' : 'Video file' }}</em>{% if missing_poster %}, {% endif %}{% endif %}{% if missing_poster %}<em>Poster image</em>{% endif %}.
+                    Please fill {{ (missing_video and missing_poster) ? 'them' : 'it' }} in to display the video.
+                </span>
+            </div>
+        {% else %}
+            <div class="ambient-video" style="aspect-ratio: {{ ratio }};"
+                 data-reveal="slide-up" style="--reveal-delay: 100ms;"
+                 data-falak-field="{{ source == 'url' ? 'video_url' : 'video_file' }}"
+                 data-falak-label="{{ trans('editor.field.video') }}"
+                 data-falak-bind="none"
+                 data-falak-part="video_frame">
+                <video class="ambient-video__media"
+                       src="{{ video_src }}"
+                       data-falak-bind-src="{{ source == 'url' ? 'video_url' : 'video_file' }}"
+                       poster="{{ component.poster }}"
+                       autoplay muted loop playsinline
+                       preload="auto"
+                       disablepictureinpicture
+                       disableremoteplayback
+                       controlslist="nodownload nofullscreen noremoteplayback"
+                       aria-hidden="true"
+                       tabindex="-1"></video>
+            </div>
+        {% endif %}
+    </div>
+</section>

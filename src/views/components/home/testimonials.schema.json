@@ -1,0 +1,248 @@
+{
+    "key": "falak-testimonials",
+    "path": "home.testimonials",
+    "title": {
+        "ar": "آراء العملاء",
+        "en": "Testimonials"
+    },
+    "icon": "chat-smile-line",
+    "is_default": true,
+    "default_sort": 40,
+    "areas": [
+        "home",
+        "pages"
+    ],
+    "styleable": [
+        {
+            "id": "title",
+            "label": {
+                "ar": "عنوان القسم",
+                "en": "Section title"
+            }
+        },
+        {
+            "id": "items",
+            "label": {
+                "ar": "البطاقة",
+                "en": "Card"
+            },
+            "properties": [
+                "max_width",
+                "align_self",
+                "text_align",
+                "padding_block",
+                "padding_inline",
+                "background_color",
+                "border_radius",
+                "border_width",
+                "border_color"
+            ]
+        },
+        {
+            "id": "quote",
+            "label": {
+                "ar": "الاقتباس",
+                "en": "Quote"
+            }
+        },
+        {
+            "id": "author",
+            "label": {
+                "ar": "العميل",
+                "en": "Customer"
+            }
+        },
+        {
+            "id": "author_name",
+            "label": {
+                "ar": "اسم العميل",
+                "en": "Customer name"
+            }
+        },
+        {
+            "id": "role",
+            "label": {
+                "ar": "الوظيفة أو الصفة",
+                "en": "Role"
+            }
+        },
+        {
+            "id": "picture",
+            "label": {
+                "ar": "صورة العميل",
+                "en": "Picture"
+            },
+            "properties": [
+                "border_radius",
+                "border_width",
+                "border_color"
+            ]
+        },
+        {
+            "id": "stars",
+            "label": {
+                "ar": "النجوم",
+                "en": "Stars"
+            },
+            "properties": [
+                "font_size",
+                "color",
+                "text_align"
+            ]
+        }
+    ],
+    "fields": [
+        {
+            "id": "title",
+            "type": "string",
+            "format": "text",
+            "label": {
+                "ar": "العنوان",
+                "en": "Title"
+            },
+            "multilanguage": true,
+            "required": false,
+            "maxLength": 100,
+            "value": {
+                "ar": "آراء عملائنا",
+                "en": "What our customers say"
+            }
+        },
+        {
+            "id": "show_stars",
+            "type": "boolean",
+            "format": "switch",
+            "label": {
+                "ar": "إظهار التقييم بالنجوم",
+                "en": "Show star ratings"
+            },
+            "description": {
+                "ar": "إخفاؤها يعرض الاقتباسات فقط.",
+                "en": "Turning this off shows the quotes on their own."
+            },
+            "value": true
+        },
+        {
+            "id": "items",
+            "type": "collection",
+            "format": "collection",
+            "label": {
+                "ar": "التقييمات",
+                "en": "Reviews"
+            },
+            "item_label": {
+                "ar": "تقييم",
+                "en": "Review"
+            },
+            "required": true,
+            "minLength": 1,
+            "maxLength": 30,
+            "value": [
+                {
+                    "items.name": "Reem.A",
+                    "items.role": {
+                        "ar": "صاحبة متجر زهور",
+                        "en": "Flower shop owner"
+                    },
+                    "items.picture": null,
+                    "items.stars": 5,
+                    "items.text": {
+                        "ar": "تجربة تسوق رائعة جداً! المنتجات ممتازة والتوصيل كان أسرع مما توقعت.",
+                        "en": "An amazing shopping experience! The products are excellent and the delivery was faster than expected."
+                    }
+                },
+                {
+                    "items.name": "Noura Al Balushi",
+                    "items.role": {
+                        "ar": "معلمة رسم",
+                        "en": "Drawing teacher"
+                    },
+                    "items.picture": null,
+                    "items.stars": 5,
+                    "items.text": {
+                        "ar": "التعامل راقي جداً والمنتجات فاخرة وتستحق التجربة. سأكرر الطلب بالتأكيد.",
+                        "en": "Very classy service and the products are truly high quality. I will definitely order again."
+                    }
+                },
+                {
+                    "items.name": "Sarah Al-Zahrani",
+                    "items.role": {
+                        "ar": "موظفة",
+                        "en": "Employee"
+                    },
+                    "items.picture": null,
+                    "items.stars": 5,
+                    "items.text": {
+                        "ar": "جودة المنتجات ممتازة ومطابقة تماماً للوصف والصور، شكراً لكم 👏",
+                        "en": "Top-notch product quality, exactly as described. Thank you so much 👏"
+                    }
+                }
+            ],
+            "fields": [
+                {
+                    "id": "items.name",
+                    "type": "string",
+                    "format": "text",
+                    "label": {
+                        "ar": "اسم العميل",
+                        "en": "Customer name"
+                    },
+                    "required": true,
+                    "maxLength": 80
+                },
+                {
+                    "id": "items.role",
+                    "type": "string",
+                    "format": "text",
+                    "label": {
+                        "ar": "الوظيفة أو الصفة",
+                        "en": "Role or occupation"
+                    },
+                    "multilanguage": true,
+                    "required": false,
+                    "maxLength": 80
+                },
+                {
+                    "id": "items.picture",
+                    "type": "string",
+                    "format": "image",
+                    "label": {
+                        "ar": "صورة العميل",
+                        "en": "Customer picture"
+                    },
+                    "required": false
+                },
+                {
+                    "id": "items.stars",
+                    "type": "number",
+                    "format": "integer",
+                    "label": {
+                        "ar": "عدد النجوم",
+                        "en": "Stars"
+                    },
+                    "value": 5,
+                    "minimum": 1,
+                    "maximum": 5,
+                    "conditions": [
+                        {
+                            "id": "show_stars",
+                            "value": true
+                        }
+                    ]
+                },
+                {
+                    "id": "items.text",
+                    "type": "string",
+                    "format": "textarea",
+                    "label": {
+                        "ar": "نص التقييم",
+                        "en": "Review text"
+                    },
+                    "multilanguage": true,
+                    "required": true,
+                    "maxLength": 300
+                }
+            ]
+        }
+    ]
+}

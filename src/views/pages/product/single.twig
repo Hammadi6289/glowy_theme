@@ -1,0 +1,325 @@
+{#
+    Product detail page.
+    | Variable | Type  | Description                                                        |
+    | product  | array | id, name, description, price (formatted), price_amount, currency,  |
+    |          |       | image, images[], url                                               |
+#}
+{% extends "layouts.master" %}
+
+{% block title %}{{ product.name }} — {{ store.name }}{% endblock %}
+{% block meta_description %}{{ product.description|default(product.name)|escape }}{% endblock %}
+
+{% block content %}
+    <div class="container product-single">
+        {% if theme.settings.get('product_show_breadcrumbs', true) %}
+            <falak-breadcrumb></falak-breadcrumb>
+        {% endif %}
+
+        <div class="product-single__layout">
+            <div class="product-single__gallery{{ product.images|length > 1 ? ' has-thumbs' : '' }}">
+                {% if product.images|length > 0 %}
+                    <div class="gallery__main">
+                        <img src="{{ product.images|first }}" alt="{{ product.name }}"
+                             data-gallery-main
+                             class="product-image--{{ theme.settings.get('product_image_fit', 'contain') }}">
+                        <falak-wishlist-button product-id="{{ product.id }}" button-class="btn btn--gallery-wishlist" aria-label="{{ trans('product.add_to_wishlist') }}"></falak-wishlist-button>
+                    </div>
+
+                    {# Desktop: a vertical rail to the start side of the photo.
+                       Mobile: a horizontal strip under it (see CSS). #}
+                    {% if product.images|length > 1 %}
+                        <div class="gallery__thumbs">
+                            {% for image in product.images %}
+                                <button type="button"
+                                        class="gallery__thumb{{ loop.first ? ' is-active' : '' }}"
+                                        data-gallery-thumb="{{ image }}"
+                                        aria-label="{{ product.name }} {{ loop.index }}">
+                                    <img src="{{ image }}" alt="{{ product.name }}" loading="lazy">
+                                </button>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="gallery__main">
+                        <div class="product-card__placeholder" aria-hidden="true">🛍</div>
+                    </div>
+                {% endif %}
+
+                {# Trust strip + payment methods, shown under the gallery. #}
+                <div class="product-single__extras">
+                    <ul class="product-trust">
+                        <li class="product-trust__item">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6l7-3zm-3 9l2 2 4-4"/></svg>
+                            <span>{{ trans('product.original_product') }}</span>
+                        </li>
+                        <li class="product-trust__item">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11a4 4 0 010 8H8m0 0l3-3m-3 3l3 3"/></svg>
+                            <span>{{ trans('product.easy_returns') }}</span>
+                        </li>
+                        <li class="product-trust__item">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7M7 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm11 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>
+                            <span>{{ trans('product.fast_delivery') }}</span>
+                        </li>
+                    </ul>
+
+                    {# Same component the footer uses; collapses when the store has none. #}
+                    <falak-payments hide-title class="product-single__payments"></falak-payments>
+                </div>
+            </div>
+
+            <div class="product-single__info">
+                <h1>{{ product.name }}</h1>
+
+                {#
+                    Platform component. `fetch` is opt-in per element — here it
+                    is on because the product page is one product and one extra
+                    request; the listing grid below leaves it off.
+
+                    Only rendered once the product HAS a review: empty stars and
+                    a "0" under the name read as a bad score rather than as no
+                    score yet, and the guard also saves the fetch on a product
+                    nobody has reviewed. The reviews section further down still
+                    shows, so a shopper can be the first to write one.
+                #}
+                {% if product.reviews_count > 0 %}
+                    <falak-rating-stars product-id="{{ product.id }}" fetch show-value></falak-rating-stars>
+                {% endif %}
+
+                {# data-product-price: app.js rewrites it when a variant is chosen. #}
+                <p class="product-single__price" data-product-price>
+                    {{ product.price }}{% if product.compare_at %} <del>{{ product.compare_at }}</del>{% endif %}
+                </p>
+
+                {% if product.description %}
+                    {# Clamped to a few lines; app.js adds the Read more toggle only when it overflows. #}
+                    <div class="product-single__description" data-readmore
+                         data-more="{{ trans('product.read_more') }}">{{ product.description }}</div>
+                {% endif %}
+
+                {# Size guide — renders nothing unless the merchant set one. #}
+                <falak-product-size-guide product-id="{{ product.id }}"
+                                          content="{{ product.size_guide|default('')|escape('html_attr') }}"
+                                          image="{{ product.size_guide_image|default('') }}"
+                                          class="product-single__size-guide"></falak-product-size-guide>
+
+                {% if product.variations|length > 0 %}
+                    {# Variant chooser — the platform component. One pill group per
+                       attribute; the add button below consults it before adding. #}
+                    <falak-product-options product-id="{{ product.id }}"
+                                           variations="{{ product.variations|json_encode|escape('html_attr') }}"
+                                           {% if product.options is defined and product.options %}options="{{ product.options|json_encode|escape('html_attr') }}"{% endif %}
+                                           class="product-single__options"></falak-product-options>
+                {% endif %}
+
+                <div class="buy-box">
+                    {#
+                        Replaces the hand-rolled stepper. It renders a hidden
+                        input named `quantity` so a plain form post still works,
+                        and exposes .value plus a `change` event for app.js.
+                    #}
+                    <falak-quantity-input
+                        name="quantity"
+                        product-id="{{ product.id }}"
+                        value="1"
+                        min="1"{% if product.available is defined and product.available is not null %} max="{{ product.available }}"{% endif %}></falak-quantity-input>
+
+                    {# SDK add button: reads the stepper above via
+                       quantity-selector, adds for guest or customer, and
+                       reports back itself. Sold out disables it. #}
+                    <falak-add-product-button product-id="{{ product.id }}"
+                                              product-status="{{ (product.in_stock is defined and not product.in_stock) ? 'out' : 'sale' }}"
+                                              quantity-selector="falak-quantity-input"
+                                              button-class="btn btn--primary"
+                                              source="product"></falak-add-product-button>
+
+                    {# Buy now — a single-item checkout that skips the cart
+                       entirely, in its own modal (mini-checkout). Shares
+                       add-to-cart's option/quantity/stock handling — it
+                       extends the same component — but never calls the cart
+                       API at all. #}
+                    <falak-quick-buy product-id="{{ product.id }}"
+                                     product-status="{{ (product.in_stock is defined and not product.in_stock) ? 'out' : 'sale' }}"
+                                     quantity-selector="falak-quantity-input"
+                                     button-class="btn btn--outline"
+                                     product-name="{{ product.name }}"
+                                     product-image="{{ product.image }}"
+                                     product-price="{{ product.price }}"
+                                     mini-checkout
+                                     source="product"></falak-quick-buy>
+
+                </div>
+
+                {# Product SKU 
+                 <button type="button" class="product-single__sku-copy" data-copy-sku aria-label="{{ trans('common.copy') }}" title="{{ trans('common.copy') }}">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                    </button>
+                    #}
+                <div class="product-single__sku" data-product-sku{% if not (product.sku or product.code) %} hidden{% endif %}>
+                    <span class="product-single__sku-label">{{ trans('product.sku') }}:</span>
+                    <span class="product-single__sku-value" data-product-sku-value>{{ product.sku|default(product.code) }}</span>
+                </div>
+
+                {# Compare & Share row (directly follows buy box, matching reference theme) #}
+                <div class="product-single__actions-row">
+                    {% if theme.settings.get('compare_enabled', true) %}
+                        <button class="product-single__compare" type="button" data-compare-toggle="{{ product.id }}" aria-pressed="false">
+                            <svg class="product-single__compare-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>{{ trans('compare.add') }}</span>
+                        </button>
+                    {% endif %}
+
+                    <falak-social mode="share" class="product-single__share"
+                                  share-text="{{ product.name }}"></falak-social>
+                </div>
+
+                {# Sold out (product or chosen variant): "notify me when it's back". #}
+                <falak-product-availability product-id="{{ product.id }}"
+                                            product-status="{{ (product.in_stock is defined and not product.in_stock) ? 'out' : 'sale' }}"
+                                            button-class="btn btn--outline btn--notify"
+                                            class="product-single__availability"></falak-product-availability>
+
+
+                {# Offers targeting THIS product — the legacy ProductSpecialOffers
+                   port. Gated by the dashboard Marketing Settings (enable special
+                   offers + show below product); renders nothing otherwise, and
+                   only for offers whose product list names this product. #}
+                <falak-offers below-product product-id="{{ product.id }}" limit="3"
+                              class="product-single__offers"></falak-offers>
+            </div>
+        </div>
+
+        {# Product tabs: Description, Comments / Reviews, Shipping & Returns #}
+        <section class="product-single__tabs" data-tabs>
+            <div class="product-tabs__nav" role="tablist">
+                <button type="button" class="product-tabs__btn is-active" role="tab" aria-selected="true" data-tab-target="tab-description">
+                    <span>{{ trans('product.description') }}</span>
+                </button>
+                <button type="button" class="product-tabs__btn" role="tab" aria-selected="false" data-tab-target="tab-comments">
+                    <span>{{ trans('product.comments') }}</span>
+                </button>
+                {% if theme.settings.get('shipping_note', '') %}
+                    <button type="button" class="product-tabs__btn" role="tab" aria-selected="false" data-tab-target="tab-shipping">
+                        <span>{{ trans('product.shipping_returns') }}</span>
+                    </button>
+                {% endif %}
+            </div>
+
+            <div class="product-tabs__panels">
+                <div class="product-tabs__panel is-active" id="tab-description" role="tabpanel">
+                    {% set detailed_desc = product.detailed_description|default(product.detail_description)|default(product.details)|default(product.long_description)|default(product.description) %}
+                    {% if detailed_desc %}
+                        <div class="product-single__full-desc" data-product-detailed-desc>
+                            {{ detailed_desc|raw }}
+                        </div>
+                    {% else %}
+                        <p class="product-tabs__empty">{{ trans('product.details') }}</p>
+                    {% endif %}
+
+                    {# Product specifications / dimensions: Weight, Height, Width, Length #}
+                    {% set spec_weight = product.weight|default(product.shipping_weight) %}
+                    {% set spec_height = product.height|default(product.dimensions.height|default('')) %}
+                    {% set spec_width = product.width|default(product.dimensions.width|default('')) %}
+                    {% set spec_length = product.length|default(product.dimensions.length|default(product.depth|default(''))) %}
+                    {% set has_specs = spec_weight or spec_height or spec_width or spec_length %}
+
+                    <div class="product-specs" data-product-specs{% if not has_specs %} hidden{% endif %}>
+                        <h3 class="product-specs__title">{{ trans('product.specifications') }}</h3>
+                        <div class="product-specs__grid">
+                            <div class="product-specs__item" data-spec-item="weight"{% if not spec_weight %} hidden{% endif %}>
+                                <div class="product-specs__icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="6" r="3"/>
+                                        <path d="M6 12h12l-1.5 8.5a1.5 1.5 0 0 1-1.5 1.5H9a1.5 1.5 0 0 1-1.5-1.5L6 12z"/>
+                                    </svg>
+                                </div>
+                                <div class="product-specs__content">
+                                    <span class="product-specs__label">{{ trans('product.weight') }}</span>
+                                    <span class="product-specs__value">
+                                        <span data-spec-val="weight">{{ spec_weight }}</span>
+                                        <span class="product-specs__unit" data-spec-unit="weight">{{ trans('common.unit_kg') }}</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="product-specs__item" data-spec-item="height"{% if not spec_height %} hidden{% endif %}>
+                                <div class="product-specs__icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 3v18M8 6l4-3 4 3M8 18l4 3 4-3"/>
+                                    </svg>
+                                </div>
+                                <div class="product-specs__content">
+                                    <span class="product-specs__label">{{ trans('product.height') }}</span>
+                                    <span class="product-specs__value">
+                                        <span data-spec-val="height">{{ spec_height }}</span>
+                                        <span class="product-specs__unit" data-spec-unit="height">{{ trans('common.unit_cm') }}</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="product-specs__item" data-spec-item="width"{% if not spec_width %} hidden{% endif %}>
+                                <div class="product-specs__icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 12h18M6 8l-3 4 3 4M18 8l3 4-3 4"/>
+                                    </svg>
+                                </div>
+                                <div class="product-specs__content">
+                                    <span class="product-specs__label">{{ trans('product.width') }}</span>
+                                    <span class="product-specs__value">
+                                        <span data-spec-val="width">{{ spec_width }}</span>
+                                        <span class="product-specs__unit" data-spec-unit="width">{{ trans('common.unit_cm') }}</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="product-specs__item" data-spec-item="length"{% if not spec_length %} hidden{% endif %}>
+                                <div class="product-specs__icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 3L3 21M7 3h14v14M17 21H3V7"/>
+                                    </svg>
+                                </div>
+                                <div class="product-specs__content">
+                                    <span class="product-specs__label">{{ trans('product.length') }}</span>
+                                    <span class="product-specs__value">
+                                        <span data-spec-val="length">{{ spec_length }}</span>
+                                        <span class="product-specs__unit" data-spec-unit="length">{{ trans('common.unit_cm') }}</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-tabs__panel" id="tab-comments" role="tabpanel" hidden>
+                    <div class="product-comments-empty" id="product-comments-empty">
+                        <svg class="product-comments-empty__icon" viewBox="0 0 64 64" width="68" height="68" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M28 11 C19.2 11 12 16.8 12 24 C12 28.5 14.8 32.4 19 34.8 C21.6 36.3 24.7 37 28 37 C29.5 37 31 36.8 32.5 36.4 L39 42 L38 34.8 C41.6 32.5 44 28.5 44 24 C44 16.8 36.8 11 28 11 Z" />
+                            <path d="M42 27 C47 28.5 50.5 32.5 50.5 37.5 C50.5 41 48.8 44.1 46 46 L47 52 L41.5 48.5 C39.5 49.5 37.3 50 35 50 C31 50 27.5 48.5 25 46" />
+                        </svg>
+                        <p class="product-comments-empty__text">{{ trans('reviews.none_yet')|default('No reviews yet — be the first.') }}</p>
+                    </div>
+                    <falak-reviews-summary product-id="{{ product.id }}" class="product-single__reviews-summary"></falak-reviews-summary>
+                    <falak-comments product-id="{{ product.id }}" per-page="5"></falak-comments>
+                </div>
+
+                {% if theme.settings.get('shipping_note', '') %}
+                    <div class="product-tabs__panel" id="tab-shipping" role="tabpanel" hidden>
+                        <div class="product-single__shipping-note">
+                            {{ theme.settings.get('shipping_note', '') }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        {# Fetches and renders its own <falak-product-card> children. #}
+        <section class="product-single__related">
+            <h2>{{ trans('product.related') }}</h2>
+            <falak-products-list limit="4" columns="4" card-button source="product.single"></falak-products-list>
+        </section>
+    </div>
+{% endblock %}

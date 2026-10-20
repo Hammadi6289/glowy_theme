@@ -1,0 +1,64 @@
+{#
+    Contact form — merchant-placeable content block (home + builder pages).
+    | Variable                  | Type    | Description                          |
+    | component.title           | ?string | section title, localized server-side |
+    | component.subtitle        | ?string | line under the title                 |
+    | component.badge           | ?string | small badge above title              |
+    | component.image           | ?string | optional image                       |
+    | component.image_position  | ?string | start, end, top, bottom              |
+    | component.show_subject    | ?bool   | whether the subject field appears    |
+    | component.show_channels   | ?bool   | whether direct contact links appear  |
+    | position                  | int     |                                      |
+
+    Customizer bindings — full rules in README, "Customizer annotations".
+    | Element            | Tag                                  |
+    | h2.block__title    | data-falak-field="title"             |
+    | p.block__subtitle  | data-falak-field="subtitle"          |
+    | img.contact__image | data-falak-field="image"             |
+    | span.contact-badge | data-falak-field="badge"             |
+
+    <falak-contact-form> is an SDK component: it owns the fields, the
+    validation, the busy state and the success panel, and posts through
+    falak.contact.send() to /api/storefront/contact.
+#}
+{% set img_pos = component.image_position|default('start') %}
+{% set has_image = component.image is defined and component.image %}
+{% set show_channels = component.show_channels|default(false) %}
+
+<section class="block block--contact" id="contact-{{ position }}" {{ falak_section() }}>
+    <div class="container">
+        {% if component.badge or component.title or component.subtitle %}
+            <div class="contact__header" data-reveal="fade">
+                {% if component.badge %}
+                    <span class="contact-badge" data-falak-field="badge" data-falak-part="badge">{{ component.badge }}</span>
+                {% endif %}
+                {% if component.title %}
+                    <h2 class="block__title contact__title" data-falak-field="title" data-falak-label="{{ trans('editor.field.title') }}">{{ component.title }}</h2>
+                {% endif %}
+                {% if component.subtitle %}
+                    <p class="block__subtitle contact__subtitle" data-falak-field="subtitle" data-falak-label="{{ trans('editor.field.description') }}">{{ component.subtitle }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="contact contact--pos-{{ img_pos }}{{ has_image ? '' : ' contact--single' }}" data-reveal="slide-up" style="--reveal-delay: 120ms;">
+            {% if has_image %}
+                <div class="contact__media" data-falak-part="image">
+                    <img class="contact__image" data-falak-field="image" data-falak-label="{{ trans('editor.field.image') }}" src="{{ component.image }}" alt="{{ component.title|default('') }}" loading="lazy">
+                </div>
+            {% endif %}
+
+            <div class="contact__content">
+                <div class="contact__form" data-falak-part="form">
+                    <falak-contact-form {{ component.show_subject is defined and not component.show_subject ? 'hide-subject' : '' }}></falak-contact-form>
+                </div>
+
+                {% if show_channels %}
+                    <div class="contact__channels">
+                        <falak-contact-links only="mobile,phone,email,whatsapp" labels="true"></falak-contact-links>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
